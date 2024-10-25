@@ -1,0 +1,2 @@
+/api/* https://noona-shopping-malls-1ec483172da6.herokuapp.com/api/:splat 200,
+/* /index.html 200
