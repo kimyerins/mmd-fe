@@ -38,6 +38,7 @@ const Navbar = ({ user }) => {
     }
   };
   const handleLogout = () => {
+    console.log("Logging out...");
     dispatch(logout());
   };
   return (
