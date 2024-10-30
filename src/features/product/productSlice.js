@@ -9,7 +9,16 @@ import { showToastMessage } from "../common/uiSlice";
 // 비동기 액션 생성
 export const getProductList = createAsyncThunk(
   "products/getProductList",
-  async (query, { rejectWithValue }) => {}
+  async (query, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/product", { params: { ...query } });
+      console.log("rrr", response);
+      if (response.status !== 200) throw new Error(response.error);
+      return response.data;
+    } catch (error) {
+      rejectWithValue(error.error);
+    }
+  }
 );
 
 export const getProductDetail = createAsyncThunk(
@@ -67,19 +76,33 @@ const productSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(createProduct.pending, (state, action) => {
-      state.loading = true;
-    });
-    builder.addCase(createProduct.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = "";
-      state.success = true; // 상품 생성 성공? 다이얼로그 닫기 실패? 실패 메세지 다이어로그에 보여주고 닫진않음
-    });
-    builder.addCase(createProduct.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-      state.success = false;
-    });
+    builder
+      .addCase(createProduct.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(createProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.success = true; // 상품 생성 성공? 다이얼로그 닫기 실패? 실패 메세지 다이어로그에 보여주고 닫진않음
+      })
+      .addCase(createProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+      })
+      .addCase(getProductList.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getProductList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productList = action.payload.data;
+        state.error = "";
+        state.totalPageNum = action.payload.totalPageNum;
+      })
+      .addCase(getProductList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
